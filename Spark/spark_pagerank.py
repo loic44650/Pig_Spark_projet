@@ -1,6 +1,3 @@
-# From https://github.com/apache/spark/blob/master/examples/src/main/python/pagerank.py
-
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -47,13 +44,15 @@ def parseNeighbors(urls):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print("Usage: pagerank <file> <iterations>", file=sys.stderr)
         sys.exit(-1)
 
     print("WARN: This is a naive implementation of PageRank and is given as an example!\n" +
           "Please refer to PageRank implementation provided by graphx",
           file=sys.stderr)
+
+    damping = float(sys.argv[3])
 
     # Initialize the spark context.
     spark = SparkSession\
@@ -81,7 +80,7 @@ if __name__ == "__main__":
             lambda url_urls_rank: computeContribs(url_urls_rank[1][0], url_urls_rank[1][1]))
 
         # Re-calculates URL ranks based on neighbor contributions.
-        ranks = contribs.reduceByKey(add).mapValues(lambda rank: rank * 0.85 + 0.15)
+        ranks = contribs.reduceByKey(add).mapValues(lambda rank: rank * damping + (1-damping))
 
     # Collects all URL ranks and dump them to console.
     for (link, rank) in ranks.collect():

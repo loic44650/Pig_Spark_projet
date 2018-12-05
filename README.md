@@ -29,3 +29,9 @@ exemple d'utilisation:
 Les données de chaque itération du pagerank sont crées dans un dossier /Pig/output_nomDataset.
 
 Une repréentation lisible du résultat de la dernière itéartion est est également crée: /Pig/pagerank_nomDataset
+
+## SparkSession
+
+### Execution
+
+> `spark-submit spark_pagerank.py ../data/example_spark nbIter damping`
