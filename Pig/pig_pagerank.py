@@ -45,13 +45,13 @@ for i in range(nbIter):
 
 nbi = str(nbIter)
 file = open("out_"+name+"/pagerank_iter_"+nbi+"/part-r-00000","r")
-str = file.read().split("\n")
-str.pop()
-clean = [{"url":i.split(" ")[0],"rank":i.split(" ")[1]} for i in str]
+lines = file.read().split("\n")
+lines.pop()
+clean = [{"url":i.split(" ")[0],"rank":format(float(i.split(" ")[1]), '1.16f')} for i in lines]
 orderedclean = sorted(clean, key=lambda k: k['rank'], reverse=True)
 file.close()
 
 file = open("pagerank_"+name,"w")
 for d in orderedclean:
-    file.write(d["rank"]+"\t"+d["url"]+"\n")
+    file.write(str(d["rank"])+"\t"+d["url"]+"\n")
 file.close()
