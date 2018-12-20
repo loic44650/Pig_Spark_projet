@@ -2,6 +2,7 @@
 from org.apache.pig.scripting import *
 import sys
 import os
+from datetime import datetime
 
 dataFile = sys.argv[1]
 name = os.path.splitext(os.path.basename(dataFile))[0]
@@ -34,14 +35,20 @@ STORE new_pagerank
 
 params = { 'd': damping, 'docs_in': dataFile } #data.txt
 
+startTime = datetime.now()
 for i in range(nbIter):
-	out = "out_"+name+"/pagerank_iter_" + str(i + 1)
-	params["docs_out"] = out
-	Pig.fs("rmr " + out)
-	stats = P.bind(params).runSingle()
-	if not stats.isSuccessful():
-		raise 'failed'
-	params["docs_in"] = out
+    out = "out_"+name+"/pagerank_iter_" + str(i + 1)
+    params["docs_out"] = out
+    Pig.fs("-rm -r " + out)
+    itStartTime = datetime.now()
+    stats = P.bind(params).runSingle()
+    if not stats.isSuccessful():
+        raise 'failed'
+    params["docs_in"] = out
+durationTime = datetime.now()-startTime
+print("Time: "+str(durationTime.total_seconds()*1000.0)+"ms")
+
+#plt.plot(iterationsTime)
 
 nbi = str(nbIter)
 file = open("out_"+name+"/pagerank_iter_"+nbi+"/part-r-00000","r")

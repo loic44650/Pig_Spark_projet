@@ -1,32 +1,10 @@
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-"""
-This is an example implementation of PageRank. For more conventional use,
-Please refer to PageRank implementation provided by graphx
-Example Usage:
-bin/spark-submit examples/src/main/python/pagerank.py data/mllib/pagerank_data.txt 10
-"""
 from __future__ import print_function
 
 import os
 import re
 import sys
 from operator import add
+from datetime import datetime
 import numpy as np
 
 from pyspark.sql import SparkSession
@@ -43,7 +21,6 @@ def parseLinks(line):
     parts = line.split(" ")
     links = map(lambda l : l[1:-1], parts[2][1:-1].split(","))
     links = filter(lambda l : l != "", links)
-    #print(links, "\n")
     return [(parts[0], links) ,(parts[0], float(parts[1]))]
 
 if __name__ == "__main__":
@@ -66,9 +43,9 @@ if __name__ == "__main__":
     links = lines.map(lambda urls: urls[0])
     ranks = lines.map(lambda urls: urls[1])
 
-    #print(links.collect())
 
     # Calculates and updates URL ranks continuously using PageRank algorithm.
+    startTime = datetime.now()
     for iteration in range(int(sys.argv[2])):
         # Calculates URL contributions to the rank of other URLs.
         contribs = links.join(ranks).flatMap(
@@ -76,6 +53,9 @@ if __name__ == "__main__":
 
         # Re-calculates URL ranks based on neighbor contributions.
         ranks = contribs.reduceByKey(add).mapValues(lambda rank: rank * damping + (1-damping))
+
+    durationTime = datetime.now()-startTime
+    print("Time: "+str(durationTime.total_seconds()*1000.0)+"ms")
 
     # Collects all URL ranks and dump them to console.
     ordered = []

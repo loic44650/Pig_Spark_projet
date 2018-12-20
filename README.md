@@ -49,7 +49,3 @@ Exemple d'utilisation:
 #### Output
 
 Les données du pagerank de la dernière itération sont affichées dans un fichier: /Spark/pagerank_nomDataset
-
-## Statistiques
-
-// TODO
